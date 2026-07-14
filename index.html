@@ -186,6 +186,8 @@ footer .logo img{height:66px}
   #servicos .panel{padding:30px 20px}
   #portfolio .panel{padding:34px 14px}
   .logo img{height:42px}
+  /* sem backdrop-filter no mobile: senao o header vira "containing block" e quebra o menu fixed */
+  header.scrolled{background:var(--sage);-webkit-backdrop-filter:none;backdrop-filter:none}
   .nav{position:fixed;inset:0 0 0 auto;width:min(78%,300px);background:var(--cream);flex-direction:column;
     justify-content:center;gap:24px;transform:translateX(100%);box-shadow:var(--shadow);z-index:55;
     visibility:hidden;pointer-events:none;transition:transform .35s ease, visibility 0s linear .35s}
