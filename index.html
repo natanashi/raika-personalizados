@@ -120,8 +120,9 @@ header.scrolled{background:rgba(169,198,181,.9);backdrop-filter:blur(10px);box-s
 .car-viewport{overflow:hidden;width:100%;border-radius:24px}
 .car-track{display:flex;transition:transform .45s cubic-bezier(.4,.0,.2,1)}
 .car-slide{min-width:100%;display:flex;justify-content:center}
-.car-slide img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:24px;box-shadow:var(--shadow);
+.car-slide img,.car-slide video{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:24px;box-shadow:var(--shadow);
   background:var(--cream);display:block}
+.car-slide video{background:#000}
 .car-arrow{position:absolute;top:50%;z-index:3;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
   background:rgba(255,255,255,.88);color:var(--coral-deep);font-size:1.3rem;line-height:1;font-weight:700;
   box-shadow:var(--shadow-sm);transition:background .2s,color .2s,transform .2s;display:flex;align-items:center;justify-content:center}
@@ -377,6 +378,7 @@ footer .logo{align-items:center;margin-bottom:14px}
   // ---- Portfólio / carrossel ----
   const GAL = [
     { slug:'topo-bolo',         nome:'Topo de bolo',        n:16, legenda:'Topos de bolo temáticos que fazem a criançada (e os adultos!) sorrirem na hora do parabéns.' },
+    { slug:'painel-aniversario',nome:'Painel de aniversário', legenda:'Painéis no tema preferido — o cenário que rouba a cena e vira o ponto alto das fotos da festa.', items:[ {type:'video', file:'01.mp4'}, {type:'image', file:'02.jpeg'} ] },
     { slug:'kit-bolinho',       nome:'Kit só um bolinho',   n:11, legenda:'Cartelas de adesivos personalizados que deixam cada lembrancinha única e especial.' },
     { slug:'card-balinha',      nome:'Card + balinha',      n:4,  legenda:'Cartõezinhos com uma balinha especial — a lembrancinha fofa que encanta clientes e convidados.' },
     { slug:'caixinhas-sacolinhas-tags', nome:'Caixinhas, sacolinhas e tags', n:5, legenda:'Caixinhas, sacolinhas e tags personalizadas que transformam qualquer lembrancinha em um presente inesquecível.' },
@@ -388,15 +390,19 @@ footer .logo{align-items:center;margin-bottom:14px}
         $dots  = document.getElementById('carDots'),     $counter = document.getElementById('carCounter'),
         $leg   = document.getElementById('carLegenda'),  $prev = document.getElementById('carPrev'),
         $next  = document.getElementById('carNext'),     $wpp = document.getElementById('portWpp');
-  let gCat = 0, gIdx = 0;
+  let gCat = 0, gIdx = 0, gCount = 0;
 
   function loadCat(i){
     gCat = i; gIdx = 0; const c = GAL[i];
-    $track.innerHTML = Array.from({length:c.n}, (_,k) => {
-      const nn = String(k+1).padStart(2,'0');
-      return `<div class="car-slide"><img loading="lazy" src="img/${c.slug}/${nn}.jpeg" alt="${c.nome} personalizado da Raika — exemplo ${k+1}"></div>`;
+    const items = c.items || Array.from({length:c.n}, (_,k) => ({ type:'image', file:String(k+1).padStart(2,'0')+'.jpeg' }));
+    gCount = items.length;
+    $track.innerHTML = items.map((it,k) => {
+      if(it.type === 'video')
+        return `<div class="car-slide"><video src="img/${c.slug}/${it.file}" muted loop playsinline autoplay controls preload="metadata"></video></div>`;
+      return `<div class="car-slide"><img loading="lazy" src="img/${c.slug}/${it.file}" alt="${c.nome} personalizado da Raika — exemplo ${k+1}"></div>`;
     }).join('');
-    $dots.innerHTML = Array.from({length:c.n}, (_,k) => `<button class="car-dot${k===0?' active':''}" data-k="${k}" aria-label="Foto ${k+1}"></button>`).join('');
+    const v0 = $track.querySelector('video'); if(v0){ v0.play().catch(()=>{}); }
+    $dots.innerHTML = items.map((_,k) => `<button class="car-dot${k===0?' active':''}" data-k="${k}" aria-label="Item ${k+1}"></button>`).join('');
     $leg.textContent = c.legenda;
     $wpp.href = `https://wa.me/${WPP}?text=${encodeURIComponent('Olá Raika! Vi o portfólio de "'+c.nome+'" no site e queria encomendar o meu 💛')}`;
     document.querySelectorAll('.gal-tab').forEach(t => t.classList.toggle('active', +t.dataset.i === i));
@@ -404,10 +410,10 @@ footer .logo{align-items:center;margin-bottom:14px}
   }
   function update(){
     $track.style.transform = `translateX(-${gIdx*100}%)`;
-    $counter.textContent = `${gIdx+1} / ${GAL[gCat].n}`;
+    $counter.textContent = `${gIdx+1} / ${gCount}`;
     document.querySelectorAll('.car-dot').forEach((d,k) => d.classList.toggle('active', k===gIdx));
   }
-  function go(d){ const n = GAL[gCat].n; gIdx = (gIdx + d + n) % n; update(); }
+  function go(d){ gIdx = (gIdx + d + gCount) % gCount; update(); }
 
   $tabs.innerHTML = GAL.map((c,i) => `<button class="gal-tab${i===0?' active':''}" data-i="${i}">${c.nome}</button>`).join('');
   $tabs.addEventListener('click', e => { const b = e.target.closest('.gal-tab'); if(b) loadCat(+b.dataset.i); });
