@@ -178,8 +178,9 @@ footer .logo{align-items:center;margin-bottom:14px}
   .svc-grid,.steps{grid-template-columns:1fr}
   .svc-grid{gap:14px}
   .nav{position:fixed;inset:0 0 0 auto;width:min(78%,300px);background:var(--cream);flex-direction:column;
-    justify-content:center;gap:24px;transform:translateX(100%);transition:transform .35s;box-shadow:var(--shadow);z-index:55}
-  .nav.open{transform:translateX(0)}
+    justify-content:center;gap:24px;transform:translateX(100%);box-shadow:var(--shadow);z-index:55;
+    visibility:hidden;pointer-events:none;transition:transform .35s ease, visibility 0s linear .35s}
+  .nav.open{transform:translateX(0);visibility:visible;pointer-events:auto;transition:transform .35s ease, visibility 0s}
   .menu-btn{display:flex;z-index:60}
   .menu-btn.x span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
   .menu-btn.x span:nth-child(2){opacity:0}
